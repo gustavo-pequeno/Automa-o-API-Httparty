@@ -39,3 +39,27 @@ Dado('que o usuario consulte informacoes de funcionario') do
     # puts @create_employeee["status"]
     # puts @create_employeee.parsed_response["data"]["employee_name"]
   end
+
+  Dado('que o usuario altere uma informacao de funcionario') do
+    @put_url = 'http://dummy.restapiexample.com/api/v1/update/11'
+  end
+  
+  Quando('ele enviar as novas informacoes') do
+    @update_employeee = HTTParty.put(@put_url, :headers => {'Content-Type': 'application/json'}, body: {      
+      "employee_name": "Beatriz Morais Lima",
+      "employee_salary": 10000,
+      "employee_age": 20,
+      "profile_image": ""
+  }.to_json)
+
+  end
+  
+  Entao('as informacoes serao alteradas') do
+    expect(@update_employeee.code).to eql (200)
+    expect(@update_employeee.message).to eql 'OK'
+    expect(@update_employeee["status"]).to eql 'success'
+    expect(@update_employeee["message"]).to eql 'Successfully! Record has been updated.'
+    expect(@update_employeee['data']["employee_name"]).to eql 'Beatriz Morais Lima'
+    expect(@update_employeee['data']['employee_salary']).to eql (10000)
+    expect(@update_employeee['data']['employee_age']).to eql (20)
+  end
