@@ -1,4 +1,5 @@
-Dado('que o usuario consulte informacoes de funcionario') do
+  #GET --------------------------------------------------------------------
+  Dado('que o usuario consulte informacoes de funcionario') do
     @get_url = 'http://dummy.restapiexample.com/api/v1/employees'
   end
   
@@ -11,6 +12,7 @@ Dado('que o usuario consulte informacoes de funcionario') do
     expect(@list_employee.message).to eql 'OK'
   end
 
+  #POST --------------------------------------------------------------------
   Dado('que o usuario cadastre um novo funcionario') do
     @post_url = "http://dummy.restapiexample.com/api/v1/create"
   end
@@ -40,6 +42,7 @@ Dado('que o usuario consulte informacoes de funcionario') do
     # puts @create_employeee.parsed_response["data"]["employee_name"]
   end
 
+  #PUT --------------------------------------------------------------------
   Dado('que o usuario altere uma informacao de funcionario') do
     @put_url = 'http://dummy.restapiexample.com/api/v1/update/11'
   end
@@ -62,4 +65,24 @@ Dado('que o usuario consulte informacoes de funcionario') do
     expect(@update_employeee['data']["employee_name"]).to eql 'Beatriz Morais Lima'
     expect(@update_employeee['data']['employee_salary']).to eql (10000)
     expect(@update_employeee['data']['employee_age']).to eql (20)
+  end
+
+  #DELETE --------------------------------------------------------------------
+
+  Dado('que o usuario queira deletar um funcionario') do
+    @get_employees = HTTParty.get('http://dummy.restapiexample.com/api/v1/employees', :header =>{'Content-Type': 'application/json'})
+    @delete_url = 'http://dummy.restapiexample.com/api/v1/delete/' + @get_employees['data'][0]['id'].to_s
+
+  end
+  
+  Quando('ele enviar a identificacao unica') do
+    @delete_employee = HTTParty.delete(@delete_url, :headers => {'Content-Type': 'application/json'})
+  end
+  
+  Entao('esse funcionario sera deletado do sistema') do
+    expect(@delete_employee.code).to eql (200)
+    expect(@delete_employee.message).to eql 'OK'
+    expect(@delete_employee["status"]).to eql 'success'
+    expect(@delete_employee['data']).to eql '1'
+    expect(@delete_employee["message"]).to eql 'Successfully! Record has been deleted'
   end
